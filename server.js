@@ -39,7 +39,7 @@ app.use(async (ctx, next) => {
 
 //cors
 const koaOptions = {
-  origin:'http://localhost:8080', 
+  origin:'*',
   credentials:true,            //access-control-allow-credentials:true
   optionSuccessStatus:200
 };

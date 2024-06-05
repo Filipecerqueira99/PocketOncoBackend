@@ -7,6 +7,8 @@ const permissionsController = require("./permissionController.dbops");
 
 // Create main Model
 const User = db.users
+const UserFriendsRequests = db.userFriendsRequests
+const UserFriends = db.userFriends
 
 // Main Work
 
@@ -32,6 +34,7 @@ const signUp = async (ctx) => {
             streak: 1,
             points: 0,
             level: 1,
+            weekly_points: 0,
         }
         console.log(info)
         const userCreated = await User.create(info)
@@ -151,6 +154,144 @@ const editProfile = async (ctx) => {
         console.log(e)
     }
 
+};
+
+// Get user weekly information and friends information
+const getScoreboardInfo = async (ctx) => {
+    let info = {
+        idUser: ctx.request.body.idUser,
+    }
+    try {
+        let userFound = await User.findAll({where: {level: 1}});
+        console.log(userFound)
+        if (userFound != null) {
+            ctx.body = {
+                userFound
+            };
+        } else {
+            ctx.body = "Error: Não encontrou nenhum"
+        }
+
+        //ir buscar info dos amigos
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
+};
+
+// User send friend requests
+const sendFriendRequest = async (ctx) => {
+    let info = {
+        idUser1: ctx.request.body.idUser1,
+        email: ctx.request.body.email,
+    }
+    try {
+        let userFound = await User.findOne({where: {email: info.email}});
+
+        let infoToAdd = {
+            idUser1: ctx.request.body.idUser1,
+            idUser2: userFound.idUser,
+        }
+
+        let requestFound = await UserFriendsRequests.findOne({
+            where: {
+                idUser1: infoToAdd.idUser1,
+                idUser2: infoToAdd.idUser2,
+            }
+        });
+
+        //console.log(requestFound)
+        if (requestFound) {
+            ctx.body = "Pedido já enviado!"
+        } else {
+            const userCreated = await UserFriendsRequests.create(infoToAdd)
+            ctx.body = "Pedido de amizade enviado!"
+        }
+
+
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
+};
+
+// User get friend requests
+const getFriendRequest = async (ctx) => {
+    let info = {
+        idUser: ctx.request.body.idUser,
+    }
+    console.log(info.idUser)
+    try {
+        let requestsFound = await UserFriendsRequests.findAll({
+            where: {
+                idUser1: info.idUser,
+            }
+        });
+        console.log(requestsFound)
+        if (requestsFound) {
+            for (let index = 0; index < requestsFound.length; index++) {
+                const userInfo = await User.findOne({
+                    where: {
+                        idUser: requestsFound[index].dataValues.idUser2,
+                    },
+                });
+                requestsFound[index].dataValues.email = userInfo.dataValues.email;
+            }
+            ctx.body = requestsFound;
+            console.log(requestsFound)
+        } else {
+            ctx.body = "";
+        }
+
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
+};
+
+// User add friend approved
+const addFriend = async (ctx) => {
+    let info = {
+        idUser1: ctx.request.body.idUser1,
+        email: ctx.request.body.email,
+    }
+    try {
+        let userFound = await User.findOne({where: {email: info.email}});
+
+        let infoToAdd = {
+            idUser1: ctx.request.body.idUser1,
+            idUser2: userFound.idUser,
+        }
+
+        let requestFound = await UserFriends.findOne({
+            where: {
+                idUser1: infoToAdd.idUser1,
+                idUser2: infoToAdd.idUser2,
+            }
+        });
+
+        if (requestFound) {
+            ctx.body = "Amigo já adicionado!"
+        } else {
+            const friendCreated = await UserFriends.create(infoToAdd)
+            const friendRequestDeleted = await UserFriendsRequests.update(
+                {
+                    idUser1: -1,
+                    idUser2: -1,
+                }, {
+                    where: {
+                        idUser1: infoToAdd.idUser1,
+                        idUser2: infoToAdd.idUser2,
+                    }
+                });
+            ctx.body = "Amigo adicionado!"
+        }
+
+
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
 };
 
 const refreshUser = async (ctx) => {
@@ -278,11 +419,12 @@ const updateUserPoints = async (ctx) => {
                 {points: points},
                 {where: {idUser: idUser}}
             );
-            if (points > 0) {
+            ctx.body = points;
+            /*if (points > 0) {
                 ctx.body = "Recebeste " + points + " pontos! Continua assim! 🎆";
             } else {
                 ctx.body = "Recebeste 0 pontos! Na próxima certamente vai correr melhor! 🍀";
-            }
+            }*/
 
         } catch (e) {
             ctx.body = "Something went wrong when updating the user points.";
@@ -330,6 +472,10 @@ module.exports = {
     signUp,
     login,
     editProfile,
+    getScoreboardInfo,
+    sendFriendRequest,
+    getFriendRequest,
+    addFriend,
     getUsers,
     getUser,
     refreshUser,

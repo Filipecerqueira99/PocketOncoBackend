@@ -46,6 +46,8 @@ db.questioncategories = require('./questionCategoryModel.js')(sequelize, Sequeli
 db.performances = require('./performanceModel.js')(sequelize, Sequelize.DataTypes)
 db.questions = require('./questionModel.js')(sequelize, Sequelize.DataTypes)
 db.userconditions = require('./userConditionModel.js')(sequelize, Sequelize.DataTypes)
+db.userFriends = require('./userFriendsModel.js')(sequelize, Sequelize.DataTypes)
+db.userFriendsRequests = require('./userFriendsRequestsModel.js')(sequelize, Sequelize.DataTypes)
 
 
 module.exports = db;

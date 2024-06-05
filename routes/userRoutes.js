@@ -24,6 +24,12 @@ publicUserRouter
     .post('/users/login', SignInlimiter, userController.login)
     .post('/users/signup', userController.signUp)
     .post('/users/editprofile', userController.editProfile)
+    .get('/users/getScoreboardInfo', userController.getScoreboardInfo)
+    .post('/users/sendFriendRequest', userController.sendFriendRequest)
+    .post('/users/getFriendRequest', userController.getFriendRequest)
+    .post('/users/addFriend', userController.addFriend)
+
+
     .post('/users/refresh-token', userController.refreshUser)
     .post('/users/updateUserPoints/:idUser', userController.updateUserPoints)
     .post('/updateUserStreak/:idUser:streak', userController.updateUserStreak)

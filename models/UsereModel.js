@@ -67,6 +67,13 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: true
             }
         },
+        weekly_points:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate:{
+                notEmpty: true
+            }
+        },
     })
 
     return User
