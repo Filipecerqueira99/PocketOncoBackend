@@ -193,20 +193,33 @@ const sendFriendRequest = async (ctx) => {
             idUser2: userFound.idUser,
         }
 
-        let requestFound = await UserFriendsRequests.findOne({
+        let friendshipFound = await UserFriends.findOne({
             where: {
                 idUser1: infoToAdd.idUser1,
                 idUser2: infoToAdd.idUser2,
             }
         });
 
-        //console.log(requestFound)
-        if (requestFound) {
-            ctx.body = "Pedido já enviado!"
-        } else {
-            const userCreated = await UserFriendsRequests.create(infoToAdd)
-            ctx.body = "Pedido de amizade enviado!"
+        if (!friendshipFound) {
+            let requestFound = await UserFriendsRequests.findOne({
+                where: {
+                    idUser1: infoToAdd.idUser1,
+                    idUser2: infoToAdd.idUser2,
+                }
+            });
+
+            //console.log(requestFound)
+            if (requestFound) {
+                ctx.body = "Pedido já enviado!"
+            } else {
+                const userCreated = await UserFriendsRequests.create(infoToAdd)
+                ctx.body = "Pedido de amizade enviado!"
+            }
+        }else{
+            ctx.body = "Já são amigos!"
+
         }
+
 
 
     } catch (e) {
