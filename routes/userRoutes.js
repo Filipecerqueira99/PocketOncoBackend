@@ -28,6 +28,12 @@ publicUserRouter
     .post('/users/sendFriendRequest', userController.sendFriendRequest)
     .post('/users/getFriendRequest', userController.getFriendRequest)
     .post('/users/addFriend', userController.addFriend)
+    .post('/users/getFriendsLevelPoints', userController.getFriendsLevelPoints)
+    .post('/users/getFriendsWeeklyResults', userController.getFriendsWeeklyResults)
+    .post('/users/getDailyMissions', userController.getDailyMissions)
+    .post('/users/getUserAwards', userController.getUserAwards)
+    .post('/users/getSugestedNewFriends', userController.getSugestedNewFriends)
+    .post('/users/editImgProfile', userController.editImgProfile)
 
 
     .post('/users/refresh-token', userController.refreshUser)

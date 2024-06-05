@@ -48,6 +48,9 @@ db.questions = require('./questionModel.js')(sequelize, Sequelize.DataTypes)
 db.userconditions = require('./userConditionModel.js')(sequelize, Sequelize.DataTypes)
 db.userFriends = require('./userFriendsModel.js')(sequelize, Sequelize.DataTypes)
 db.userFriendsRequests = require('./userFriendsRequestsModel.js')(sequelize, Sequelize.DataTypes)
+db.missions = require('./missionsModel.js')(sequelize, Sequelize.DataTypes)
+db.awards = require('./awardsModel.js')(sequelize, Sequelize.DataTypes)
+db.awardsuservalues = require('./awardsUserValuesModel.js')(sequelize, Sequelize.DataTypes)
 
 
 module.exports = db;

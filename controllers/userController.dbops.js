@@ -9,6 +9,11 @@ const permissionsController = require("./permissionController.dbops");
 const User = db.users
 const UserFriendsRequests = db.userFriendsRequests
 const UserFriends = db.userFriends
+const Missions = db.missions
+const Awards = db.awards
+const AwardsUser = db.awardsuservalues
+const QuestionCategory = db.questioncategories
+
 
 // Main Work
 
@@ -35,6 +40,7 @@ const signUp = async (ctx) => {
             points: 0,
             level: 1,
             weekly_points: 0,
+            img: "img1",
         }
         console.log(info)
         const userCreated = await User.create(info)
@@ -76,7 +82,8 @@ const login = async (ctx) => {
                     age: userFound.age,
                     streak: userFound.streak,
                     points: userFound.points,
-                    level: userFound.level
+                    level: userFound.level,
+                    img: userFound.img,
                 };
             } else {
                 ctx.body = {message: "Wrong Password.", accessToken: " ", refreshToken: " ", email: info.email};
@@ -215,11 +222,10 @@ const sendFriendRequest = async (ctx) => {
                 const userCreated = await UserFriendsRequests.create(infoToAdd)
                 ctx.body = "Pedido de amizade enviado!"
             }
-        }else{
+        } else {
             ctx.body = "Já são amigos!"
 
         }
-
 
 
     } catch (e) {
@@ -262,6 +268,226 @@ const getFriendRequest = async (ctx) => {
     }
 };
 
+//get getFriendsLevelPoints levels and points
+const getFriendsLevelPoints = async (ctx) => {
+    let info = {
+        idUser: ctx.request.body.idUser,
+    }
+
+    try {
+        let friendsFound = await UserFriends.findAll({
+            where: {
+                idUser1: info.idUser,
+            }
+        });
+        console.log(friendsFound)
+        if (friendsFound) {
+            for (let index = 0; index < friendsFound.length; index++) {
+                const userInfo = await User.findOne({
+                    where: {
+                        idUser: friendsFound[index].dataValues.idUser2,
+                    }
+                });
+                friendsFound[index].dataValues.name = userInfo.dataValues.first_name;
+                friendsFound[index].dataValues.level = userInfo.dataValues.level;
+                friendsFound[index].dataValues.streak = userInfo.dataValues.streak;
+                friendsFound[index].dataValues.img = userInfo.dataValues.img;
+            }
+
+            ctx.body = friendsFound;
+            console.log(friendsFound)
+        } else {
+            ctx.body = "";
+        }
+
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
+};
+
+//get friends weekly results for scoreboard
+const getFriendsWeeklyResults = async (ctx) => {
+    let info = {
+        idUser: ctx.request.body.idUser,
+    }
+    console.log(info.idUser)
+    try {
+        let friendsFound = await UserFriends.findAll({
+            where: {
+                idUser1: info.idUser,
+            }
+        });
+        console.log(friendsFound)
+        if (friendsFound) {
+            for (let index = 0; index < friendsFound.length; index++) {
+                const userInfo = await User.findOne({
+                    where: {
+                        idUser: friendsFound[index].dataValues.idUser2,
+                    }
+                });
+                friendsFound[index].dataValues.name = userInfo.dataValues.first_name + " " + userInfo.dataValues.last_name;
+                friendsFound[index].dataValues.weekly_points = userInfo.dataValues.weekly_points;
+            }
+
+
+            ctx.body = friendsFound;
+            console.log(friendsFound)
+        } else {
+            ctx.body = "";
+        }
+
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
+};
+
+//get daily missions
+const getDailyMissions = async (ctx) => {
+    let info = {
+        idUser: ctx.request.body.idUser,
+    }
+    console.log(info.idUser)
+    try {
+        let missionsFound = await Missions.findAll({
+            where: {
+                user_id: info.idUser,
+            }
+        });
+        console.log(missionsFound)
+
+        if (missionsFound) {
+            ctx.body = missionsFound;
+        } else {
+            ctx.body = "Missões não encontradas";
+        }
+
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
+};
+
+//get daily missions
+const getUserAwards = async (ctx) => {
+    let info = {
+        idUser: ctx.request.body.idUser,
+    }
+
+    try {
+        let userAwardsFound = await AwardsUser.findAll({
+            where: {
+                user_id: info.idUser,
+            }
+        });
+
+        for (let index = 0; index < userAwardsFound.length; index++) {
+            const awardsFound = await Awards.findOne({
+                where: {
+                    idAwards: userAwardsFound[index].dataValues.award_id,
+                }
+            });
+            userAwardsFound[index].dataValues.description = awardsFound.dataValues.description;
+            userAwardsFound[index].dataValues.goal = awardsFound.dataValues.goal;
+            userAwardsFound[index].dataValues.category_id = awardsFound.dataValues.category_id;
+        }
+
+        for (let index = 0; index < userAwardsFound.length; index++) {
+            const categoryFound = await QuestionCategory.findOne({
+                where: {
+                    idquestionCategory: userAwardsFound[index].dataValues.category_id,
+                }
+            });
+            userAwardsFound[index].dataValues.categoryName = categoryFound.dataValues.name;
+        }
+
+        console.log(userAwardsFound)
+
+        if (userAwardsFound) {
+            ctx.body = userAwardsFound;
+        } else {
+            ctx.body = "Conquistas não encontradas";
+        }
+
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
+};
+
+//get new sugested users to add as friends
+const getSugestedNewFriends = async (ctx) => {
+    let info = {
+        idUser: ctx.request.body.idUser,
+    }
+
+    try {
+        let userFriends = await UserFriends.findAll({
+            where: {
+                idUser1: info.idUser,
+            }
+        });
+
+        let allUsers = await User.findAll({});
+        //console.log(userFriends)
+
+        for (let index = 0; index < userFriends.length; index++) {
+            for (let j = 0; j < allUsers.length; j++) {
+                delete allUsers[j].dataValues.password
+                delete allUsers[j].dataValues.email
+                if (userFriends[index].dataValues.idUser2 == allUsers[j].dataValues.idUser) {
+                    console.log(allUsers[j].dataValues.email)
+                    allUsers.splice(j, 1)
+                } else if (allUsers[j].dataValues.idUser == info.idUser) {
+                    allUsers.splice(j, 1)
+                }
+            }
+        }
+
+        if (allUsers.length > 6) {
+            for (let j = 6; j < allUsers.length; j++) {
+                allUsers.splice(j, 1)
+            }
+        }
+
+        console.log(allUsers)
+
+        if (userFriends) {
+            ctx.body = allUsers;
+        } else {
+            ctx.body = "Conquistas não encontradas";
+        }
+
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
+};
+
+//editar imagem de perfil do utilizador
+const editImgProfile = async (ctx) => {
+    try {
+        let info = {
+            idUser: ctx.request.body.idUser,
+            img: ctx.request.body.img,
+        }
+
+        const userUpdated = await User.update(
+            {
+                img: info.img,
+            },
+            {where: {idUser: info.idUser}})
+
+        ctx.body = "Imagem atualizada!"
+
+    } catch (e) {
+        ctx.body = "Error: Something went wrong with the users' signup"
+        console.log(e)
+    }
+
+};
+
 // User add friend approved
 const addFriend = async (ctx) => {
     let info = {
@@ -287,6 +513,15 @@ const addFriend = async (ctx) => {
             ctx.body = "Amigo já adicionado!"
         } else {
             const friendCreated = await UserFriends.create(infoToAdd)
+
+            let infoToAdd2 = {
+                idUser2: ctx.request.body.idUser1,
+                idUser1: userFound.idUser,
+            }
+
+            const friendCreated2 = await UserFriends.create(infoToAdd2)
+
+
             const friendRequestDeleted = await UserFriendsRequests.update(
                 {
                     idUser1: -1,
@@ -489,6 +724,12 @@ module.exports = {
     sendFriendRequest,
     getFriendRequest,
     addFriend,
+    getFriendsLevelPoints,
+    getFriendsWeeklyResults,
+    getSugestedNewFriends,
+    getUserAwards,
+    getDailyMissions,
+    editImgProfile,
     getUsers,
     getUser,
     refreshUser,
