@@ -56,6 +56,13 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: false
             }
         },
+        completed:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate:{
+                notEmpty: true
+            },
+        },
 
     })
 

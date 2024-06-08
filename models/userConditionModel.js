@@ -10,19 +10,22 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: true
             },
         },
-        description:{
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate:{
-                notEmpty: true
-            },
-            unique: true
-        },
         user_id:{
             type: DataTypes.INTEGER,
             references: {
                 model: 'users',
                 key: 'idUser'
+            },
+            allowNull: false,
+            validate:{
+                notEmpty: true
+            }
+        },
+        questionCategory_id:{
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'questioncategories',
+                key: 'idquestionCategory'
             },
             allowNull: false,
             validate:{

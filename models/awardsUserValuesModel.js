@@ -28,11 +28,11 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: true
             }
         },
-        award_id:{
+        category_id:{
             type: DataTypes.INTEGER,
             references: {
-                model: 'awards',
-                key: 'idAwards'
+                model: 'questionCategories',
+                key: 'idquestionCategory'
             },
             allowNull: false,
             validate:{

@@ -11,6 +11,8 @@ const bodyParser = require('koa-bodyparser');
 const { userRouter, publicUserRouter } = require('./routes/userRoutes.js'); // TODO: LATER ON REFACTOR THIS => THINK NOT NEEDED
 const { permissionRouter } = require('./routes/permissionRoutes.js');
 const { questionRouter, questionRouterPublic } = require('./routes/questionRoutes.js');
+const { missionawardsRouter, publicMissionawardsRouter } = require("./routes/missionawardsRoutes.js");
+
 
 const app = new Koa();
 const dbModels = require('./models');
@@ -24,14 +26,14 @@ app.use(async (ctx, next) => {
   const { protocol, path } = url.parse(ctx.request.url);
 
   // Validate the request against a blacklist of paths that are not allowed
-  const blackList = ["localhost", "127.0.0.1", "127.1", "admin", "$", "%"];
+  /*const blackList = ["localhost", "127.0.0.1", "127.1", "admin", "$", "%"];
 
   for(let i=0; i<blackList.length; i++){
     if(path.includes(blackList[i])){
       ctx.throw(403, 'Forbidden');
       return;
     }
-  }
+  }*/
 
   await next();
 });
@@ -68,6 +70,9 @@ app.use(questionRouterPublic.allowedMethods());
 
 app.use(permissionRouter.routes());
 app.use(permissionRouter.allowedMethods());
+
+app.use(publicMissionawardsRouter.routes());
+app.use(publicMissionawardsRouter.allowedMethods());
 
 // build server
 const serverCallback = app.callback();
