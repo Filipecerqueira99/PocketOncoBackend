@@ -8,14 +8,3 @@
   }
 }
 
-/*
-{
-  "development": {
-    "username": "fileserver_cheeseroll",
-    "password": "9a74f39810e08099b2d671fc316716dcd481af34",
-    "database": "fileserver_cheeseroll",
-    "host": "q22.h.filess.io",
-    "dialect": "mysql",
-    "port": "3307"
-  }
-}*/
