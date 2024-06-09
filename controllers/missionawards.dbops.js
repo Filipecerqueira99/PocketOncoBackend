@@ -50,23 +50,23 @@ const createDailyMissions = async (ctx) => {
             let category_id = Math.floor(Math.random() * 9) + 1 //1 a 9
             let description = ""
             if (category_id == 1)
-                description = "aaa"
+                description = "Completa aulas na temática dor!"
             else if (category_id == 2)
-                description = "aaa"
+                description = "Completa aulas na temática Dispneia"
             else if (category_id == 3)
-                description = "aaa"
+                description = "Completa aulas na temática Insónia!"
             else if (category_id == 4)
-                description = "aaa"
+                description = "Completa aulas na temática Fadiga!"
             else if (category_id == 5)
-                description = "aaa"
+                description = "Completa aulas na temática Ansiedade!"
             else if (category_id == 6)
-                description = "aaa"
+                description = "Completa aulas na temática Anorexia!"
             else if (category_id == 7)
-                description = "aaa"
+                description = "Completa aulas na temática Diarreia!"
             else if (category_id == 8)
-                description = "aaa"
+                description = "Completa aulas na temática Obstipação!"
             else if (category_id == 9)
-                description = "aaa"
+                description = "Completa aulas na temática Vómitos!"
 
             try {
                 let infoToAdd = {
