@@ -36,14 +36,14 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: true,
             validate:{
-                notEmpty: true
+                notEmpty: false
             }
         },
         answer4:{
             type: DataTypes.STRING,
             allowNull: true,
             validate:{
-                notEmpty: true
+                notEmpty: false
             }
         },
         correctAnswer:{
