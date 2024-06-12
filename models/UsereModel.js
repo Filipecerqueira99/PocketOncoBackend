@@ -74,6 +74,13 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: true
             }
         },
+        today:{
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate:{
+                notEmpty: true
+            }
+        },
         img:{
             type: DataTypes.STRING,
             allowNull: false,

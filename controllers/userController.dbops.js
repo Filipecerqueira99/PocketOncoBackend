@@ -40,6 +40,7 @@ const signUp = async (ctx) => {
             points: 0,
             level: 1,
             weekly_points: 0,
+            today: 0,
             img: "img1",
         }
         console.log(info)
@@ -83,6 +84,7 @@ const login = async (ctx) => {
                     streak: userFound.streak,
                     points: userFound.points,
                     level: userFound.level,
+                    today: userFound.today,
                     img: userFound.img,
                 };
             } else {
@@ -607,6 +609,26 @@ const getUser = async (ctx) => {
     }
 }
 
+// Update user streak and check if first login of the day
+const updateStreakAndToday = async (ctx) => {
+    let info = {
+        idUser: ctx.request.body.idUser,
+        today: ctx.request.body.today,
+        streak: ctx.request.body.streak,
+    }
+    console.log(info.idUser)
+    try {
+        const userUpdated = await User.update(
+            {streak: info.streak, today: info.today},
+            {where: {idUser: info.idUser}}
+        );
+        ctx.body = "Atualizado";
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
+};
+
 
 async function validateInputSignUp(email, password) {
     let error = "";
@@ -735,5 +757,6 @@ module.exports = {
     refreshUser,
     updateUserPoints,
     updateUserStreak,
-    updateUserLevel
+    updateUserLevel,
+    updateStreakAndToday
 }
