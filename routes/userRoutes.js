@@ -33,6 +33,8 @@ publicUserRouter
     .post('/users/getSugestedNewFriends', userController.getSugestedNewFriends)
     .post('/users/editImgProfile', userController.editImgProfile)
     .post('/users/updateStreakAndToday', userController.updateStreakAndToday)
+    .post('/users/updateToNewPassword', userController.updateToNewPassword)
+    .post('/users/updatePasswordReset', userController.updatePasswordReset)
 
 
     .post('/users/refresh-token', userController.refreshUser)

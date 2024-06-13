@@ -88,6 +88,13 @@ module.exports = (sequelize, DataTypes) => {
                 notEmpty: true
             },
         },
+        passwordCode:{
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            validate:{
+                notEmpty: false
+            },
+        },
     })
 
     return User

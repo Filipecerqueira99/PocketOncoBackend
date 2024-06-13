@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require('../models')
 const permissionsController = require("./permissionController.dbops");
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 // Create main Model
 const User = db.users
@@ -736,6 +737,100 @@ const updateUserLevel = async (ctx) => {
     }
 }
 
+// reset to new password
+const updateToNewPassword = async (ctx) => {
+    let userEmail = ctx.request.body.email;
+    try {
+        console.log(userEmail)
+
+        let userFound = await User.findOne({where: {email: userEmail}});
+        if (userFound != null) {
+            const randomNr = Math.floor(Math.random() * 9999) + 1000;
+
+            const userUpdated = await User.update(
+                {
+                    passwordCode: randomNr,
+                },
+                {where: {email: userEmail}})
+
+
+            const Headers = (await import('node-fetch')).Headers
+            var myHeaders = new Headers()
+
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.set('Authorization', 'Basic ' + btoa('28a0aa2efc0915d547f81b37cf7fc3a0'+":" +'d98ab7bf90de1bea6f9060eff9902204'));
+
+            const data = JSON.stringify({
+                "Messages": [{
+                    "From": {"Email": "imfilcarpt@gmail.com", "Name": "PocketOnco"},
+                    "To": [{"Email": userEmail, "Name": userEmail}],
+                    "Subject": "PocketOnco - Redefinição de Senha",
+                    "TextPart": "Olá,\n" +
+                        "\n" +
+                        "Recebemos uma solicitação para redefinir a senha. Se não fizeste esta solicitação, por favor, ignora este email. \n" +
+                        "Caso contrário, segue as instruções abaixo para redefinir a mesma.\n\n" +
+                        "Para redefinir a senha utilize o código abaixo:\n" +
+                        "\n" +
+                        randomNr +
+                        "\n" +
+                        "Se você tiveres alguma dúvida ou precisares de assistência, entra em contato por pocketonco@gmail.com.\n" +
+                        "\n" +
+                        "Atenciosamente,\n" +
+                        "\n" +
+                        "Equipa PocketOnco"
+                }]
+            });
+
+            const requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: data,
+            };
+
+            fetch("https://api.mailjet.com/v3.1/send", requestOptions)
+                .then(response => response.text())
+                .then(result => console.log(result))
+                .catch(error => console.log('error', error));
+
+            ctx.body = "Email Enviado!";
+        }else{
+            ctx.body = "Utilizador não existe!";
+        }
+    } catch (e) {
+        ctx.body = "Something went wrong when updating the user level.";
+        console.log(e);
+    }
+}
+
+// update to new password
+const updatePasswordReset = async (ctx) => {
+    let userEmail = ctx.request.body.email;
+    let password = ctx.request.body.password;
+    let code = ctx.request.body.code;
+    try {
+        console.log(userEmail)
+
+        let userFound = await User.findOne({where: {email: userEmail}});
+        if (userFound != null && userFound.passwordCode == code) {
+            const userUpdated = await User.update(
+                {
+                    password: await bcrypt.hash(password, 10),
+                },
+                {where: {email: userEmail}})
+
+
+            ctx.body = "Senha alterada!";
+        }else{
+            ctx.body = "Utilizador não existe ou código errado!";
+        }
+    } catch (e) {
+        ctx.body = "Something went wrong when updating the user level.";
+        console.log(e);
+    }
+}
+
+
+
 
 module.exports = {
     rootHello,
@@ -758,5 +853,7 @@ module.exports = {
     updateUserPoints,
     updateUserStreak,
     updateUserLevel,
-    updateStreakAndToday
+    updateStreakAndToday,
+    updateToNewPassword,
+    updatePasswordReset
 }
