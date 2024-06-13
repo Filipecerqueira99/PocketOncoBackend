@@ -291,7 +291,7 @@ const getUserAwards = async (ctx) => {
                 userAwardsFound[index].dataValues.levelDesc = "Iniciante";
                 userAwardsFound[index].dataValues.goal = 20;
             }else if(userAwardsFound[index].dataValues.current_value <= 99){
-                userAwardsFound[index].dataValues.levelDesc = "Intermediário";
+                userAwardsFound[index].dataValues.levelDesc = "Competente";
                 userAwardsFound[index].dataValues.goal = 100;
             }else if(userAwardsFound[index].dataValues.current_value <= 199){
                 userAwardsFound[index].dataValues.levelDesc = "Perito";
