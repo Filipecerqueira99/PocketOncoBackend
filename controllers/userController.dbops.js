@@ -89,7 +89,7 @@ const login = async (ctx) => {
                     img: userFound.img,
                 };
             } else {
-                ctx.body = {message: "Wrong Password.", accessToken: " ", refreshToken: " ", email: info.email};
+                ctx.body = {message: "Senha errada.", accessToken: " ", refreshToken: " ", email: info.email};
             }
         } else {
             ctx.body = {message: "User does not exist.", accessToken: " ", refreshToken: " ", email: info.email};
