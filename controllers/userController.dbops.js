@@ -92,7 +92,7 @@ const login = async (ctx) => {
                 ctx.body = {message: "Senha errada.", accessToken: " ", refreshToken: " ", email: info.email};
             }
         } else {
-            ctx.body = {message: "User does not exist.", accessToken: " ", refreshToken: " ", email: info.email};
+            ctx.body = {message: "Utilizador não existe.", accessToken: " ", refreshToken: " ", email: info.email};
         }
     } catch (e) {
         ctx.body = "Error: Something went wrong with the users' login"
@@ -123,7 +123,9 @@ const editProfile = async (ctx) => {
 
 
             let userFound = await User.findOne({where: {email: info.email}});
-            if (userFound.password == info.currentPassword) {
+            const samePass = await bcrypt.compare(ctx.request.body.currentPassword, userFound.password);
+            if (samePass) {
+            //if (userFound.password == info.currentPassword) {
                 console.log(info)
                 const userUpdated = await User.update(
                     {
@@ -137,7 +139,7 @@ const editProfile = async (ctx) => {
 
                 ctx.body = userUpdated
             } else {
-                ctx.body = "Current Password está errada."
+                ctx.body = "Senha atual está errada."
             }
         } else {
             console.log("Não alterour password.")
