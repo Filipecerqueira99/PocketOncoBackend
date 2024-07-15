@@ -54,14 +54,14 @@ module.exports = (sequelize, DataTypes) => {
             }
         },
         explanation:{
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: false,
             validate:{
                 notEmpty: true
             }
         },
         tip:{
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: false,
             validate:{
                 notEmpty: true

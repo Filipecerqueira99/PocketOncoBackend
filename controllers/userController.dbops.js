@@ -10,10 +10,10 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const User = db.users
 const UserFriendsRequests = db.userFriendsRequests
 const UserFriends = db.userFriends
-const Missions = db.missions
-const Awards = db.awards
-const AwardsUser = db.awardsuservalues
-const QuestionCategory = db.questioncategories
+//const Missions = db.missions
+//const Awards = db.awards
+//const AwardsUser = db.awardsuservalues
+//const QuestionCategory = db.questioncategories
 
 
 // Main Work
@@ -349,6 +349,7 @@ const getFriendsWeeklyResults = async (ctx) => {
 };
 
 //get daily missions
+/*
 const getDailyMissions = async (ctx) => {
     let info = {
         idUser: ctx.request.body.idUser,
@@ -373,8 +374,9 @@ const getDailyMissions = async (ctx) => {
         console.log(e)
     }
 };
-
+*/
 //get daily missions
+/*
 const getUserAwards = async (ctx) => {
     let info = {
         idUser: ctx.request.body.idUser,
@@ -420,6 +422,7 @@ const getUserAwards = async (ctx) => {
         console.log(e)
     }
 };
+*/
 
 //get new sugested users to add as friends
 const getSugestedNewFriends = async (ctx) => {
@@ -846,8 +849,8 @@ module.exports = {
     getFriendsLevelPoints,
     getFriendsWeeklyResults,
     getSugestedNewFriends,
-    getUserAwards,
-    getDailyMissions,
+    //getUserAwards,
+    //getDailyMissions,
     editImgProfile,
     getUsers,
     getUser,
