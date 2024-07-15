@@ -10,6 +10,7 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const User = db.users
 const UserFriendsRequests = db.userFriendsRequests
 const UserFriends = db.userFriends
+const UserCondition = db.userconditions
 //const Missions = db.missions
 //const Awards = db.awards
 //const AwardsUser = db.awardsuservalues
@@ -125,7 +126,7 @@ const editProfile = async (ctx) => {
             let userFound = await User.findOne({where: {email: info.email}});
             const samePass = await bcrypt.compare(ctx.request.body.currentPassword, userFound.password);
             if (samePass) {
-            //if (userFound.password == info.currentPassword) {
+                //if (userFound.password == info.currentPassword) {
                 console.log(info)
                 const userUpdated = await User.update(
                     {
@@ -348,82 +349,6 @@ const getFriendsWeeklyResults = async (ctx) => {
     }
 };
 
-//get daily missions
-/*
-const getDailyMissions = async (ctx) => {
-    let info = {
-        idUser: ctx.request.body.idUser,
-    }
-    console.log(info.idUser)
-    try {
-        let missionsFound = await Missions.findAll({
-            where: {
-                user_id: info.idUser,
-            }
-        });
-        console.log(missionsFound)
-
-        if (missionsFound) {
-            ctx.body = missionsFound;
-        } else {
-            ctx.body = "Missões não encontradas";
-        }
-
-    } catch (e) {
-        ctx.body = "Error: Something went wrong"
-        console.log(e)
-    }
-};
-*/
-//get daily missions
-/*
-const getUserAwards = async (ctx) => {
-    let info = {
-        idUser: ctx.request.body.idUser,
-    }
-
-    try {
-        let userAwardsFound = await AwardsUser.findAll({
-            where: {
-                user_id: info.idUser,
-            }
-        });
-
-        for (let index = 0; index < userAwardsFound.length; index++) {
-            const awardsFound = await Awards.findOne({
-                where: {
-                    idAwards: userAwardsFound[index].dataValues.award_id,
-                }
-            });
-            userAwardsFound[index].dataValues.description = awardsFound.dataValues.description;
-            userAwardsFound[index].dataValues.goal = awardsFound.dataValues.goal;
-            userAwardsFound[index].dataValues.category_id = awardsFound.dataValues.category_id;
-        }
-
-        for (let index = 0; index < userAwardsFound.length; index++) {
-            const categoryFound = await QuestionCategory.findOne({
-                where: {
-                    idquestionCategory: userAwardsFound[index].dataValues.category_id,
-                }
-            });
-            userAwardsFound[index].dataValues.categoryName = categoryFound.dataValues.name;
-        }
-
-        console.log(userAwardsFound)
-
-        if (userAwardsFound) {
-            ctx.body = userAwardsFound;
-        } else {
-            ctx.body = "Conquistas não encontradas";
-        }
-
-    } catch (e) {
-        ctx.body = "Error: Something went wrong"
-        console.log(e)
-    }
-};
-*/
-
 //get new sugested users to add as friends
 const getSugestedNewFriends = async (ctx) => {
     let info = {
@@ -635,6 +560,53 @@ const updateStreakAndToday = async (ctx) => {
     }
 };
 
+// Gets user symptoms
+const getUserSymptoms = async (ctx) => {
+    let info = {
+        idUser: ctx.request.body.idUser,
+    }
+    try {
+        let userConditionFound = await UserCondition.findAll({where: {user_id: info.idUser}});
+        if (userConditionFound != null) {
+            ctx.body = userConditionFound
+        } else {
+            ctx.body = "User Condition/Symptom doesn't exist."
+        }
+    } catch (e) {
+        ctx.body = "Error: Something went wrong while getting the specified user symptom."
+        console.log(e)
+    }
+}
+
+
+//create user conditions/symptoms
+const createUserConditions = async (ctx) => {
+    let info = {
+        idUser: ctx.request.body.idUser,
+        conditions: ctx.request.body.conditions,
+    }
+    try {
+        //primeiro apaga os antigos sintomas
+        const deleteUserConditions = await UserCondition.destroy(
+            {where: {user_id: info.idUser}}
+        );
+        //depois adiciona os novos
+        for (let i = 1; i < info.conditions.length; i++) {
+            if(info.conditions[i]){
+                let infoToAdd = {
+                    user_id: info.idUser,
+                    questionCategory_id: i,
+                }
+                const conditionCreated = await UserCondition.create(infoToAdd)
+            }
+        }
+        ctx.body = "Sintomas adicionados!";
+    } catch (e) {
+        ctx.body = "Error: Something went wrong"
+        console.log(e)
+    }
+};
+
 
 async function validateInputSignUp(email, password) {
     let error = "";
@@ -763,7 +735,7 @@ const updateToNewPassword = async (ctx) => {
             var myHeaders = new Headers()
 
             myHeaders.append("Content-Type", "application/json");
-            myHeaders.set('Authorization', 'Basic ' + btoa('28a0aa2efc0915d547f81b37cf7fc3a0'+":" +'d98ab7bf90de1bea6f9060eff9902204'));
+            myHeaders.set('Authorization', 'Basic ' + btoa('28a0aa2efc0915d547f81b37cf7fc3a0' + ":" + 'd98ab7bf90de1bea6f9060eff9902204'));
 
             const data = JSON.stringify({
                 "Messages": [{
@@ -798,7 +770,7 @@ const updateToNewPassword = async (ctx) => {
                 .catch(error => console.log('error', error));
 
             ctx.body = "Email Enviado!";
-        }else{
+        } else {
             ctx.body = "Utilizador não existe!";
         }
     } catch (e) {
@@ -825,7 +797,7 @@ const updatePasswordReset = async (ctx) => {
 
 
             ctx.body = "Senha alterada!";
-        }else{
+        } else {
             ctx.body = "Utilizador não existe ou código errado!";
         }
     } catch (e) {
@@ -833,8 +805,6 @@ const updatePasswordReset = async (ctx) => {
         console.log(e);
     }
 }
-
-
 
 
 module.exports = {
@@ -859,6 +829,8 @@ module.exports = {
     updateUserStreak,
     updateUserLevel,
     updateStreakAndToday,
+    getUserSymptoms,
+    createUserConditions,
     updateToNewPassword,
-    updatePasswordReset
+    updatePasswordReset,
 }
