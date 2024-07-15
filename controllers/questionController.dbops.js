@@ -7,6 +7,8 @@ const {Order} = require("sequelize/lib/model");
 // Create main Model
 const Question = db.questions;
 const User = db.users;
+const UserCondition = db.userconditions
+
 
 // Gets a random multiple option question
 const getRandomMultipleOptionQuestion = async (ctx) => {
@@ -23,26 +25,61 @@ const getRandomMultipleOptionQuestion = async (ctx) => {
 // Gets 5 random questions
 const getFiveRandomQuestions = async (ctx) => {
     try {
-        //console.log(Math.random())
+        let userId = ctx.params.userId;
+        console.log(userId)
         let foundQuestion = await Question.findAll();
 
+
+        let foundConditions = await UserCondition.findAll(
+            {where: {user_id: userId}}
+        );
+        //console.log(foundConditions.length)
+
+        var arrayQuestionsFiltered = {};
+        var j = 0;
+        var x = 0;
+        var w = 0;
+        while(j < foundConditions.length){
+            console.log(foundConditions[j].questionCategory_id)
+            while(x < foundQuestion.length){
+                if (foundQuestion[x].category_id == foundConditions[j].questionCategory_id){
+                    //console.log("é da condição do user")
+                    //console.log(foundQuestion[x].idQuestion);
+                    arrayQuestionsFiltered[w] = foundQuestion[x];
+                    w++;
+                }
+                x++;
+            }
+            x = 0;
+            j++;
+        }
+
+        //To get the object size since object.lenght doesn't work
+        arrayQuestionsFiltered.length = Object.keys(arrayQuestionsFiltered).length
+        //console.log(arrayQuestionsFiltered.length)
+        //console.log(arrayQuestionsFiltered)
 
         var i = 0;
         var arrayQuestions = {};
         var lastRandom = -1;
         var listRandoms = [];
 
+
         while (i < 5){
-            var numberRnd = Math.floor(Math.random() * foundQuestion.length);
+            var numberRnd = Math.floor(Math.random() * arrayQuestionsFiltered.length);
             if (numberRnd == lastRandom){
-                numberRnd = Math.floor(Math.random() * foundQuestion.length);
+                numberRnd = Math.floor(Math.random() * arrayQuestionsFiltered.length);
             }
             listRandoms.push(numberRnd)
-            arrayQuestions[i] = foundQuestion[numberRnd]
+
+            //console.log(arrayQuestionsFiltered[numberRnd].category_id)
+            //console.log(numberRnd)
+            arrayQuestions[i] = arrayQuestionsFiltered[numberRnd]
             i++;
         }
+        //console.log("questões:")
         //console.log(arrayQuestions)
-        console.log(listRandoms)
+        //console.log(listRandoms)
 
 
         ctx.body = arrayQuestions;
